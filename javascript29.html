@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #lights {
+            display: grid;
+            grid-template-columns: 100px 100px 100px;
+            
+
+        }
+
+        #lights div {
+            border: black solid 2px;
+
+        }
+    </style>
+
+
+    <script>
+        window.addEventListener("load", function () {
+            var game = document.getElementById("lights");
+            class Square {
+                constructor(x, y) {
+                    this.coord = [x, y];
+                    this.Class = "squares";
+                    this.Colors = ["blue", "red"];
+                    this.Width = 100 + "px";
+                    this.Height = 100 + "px";
+                    this.s = document.createElement("div");
+                    this.s.id = `${x}${y}`;
+                    this.s.style.width = this.Width;
+                    this.s.style.height = this.Height;
+                    this.s.style.backgroundColor = this.Colors[parseInt(Math.random()*2)];
+                    this.s.addEventListener('click', function () {
+                        let ID = parseInt(this.id);
+                        let change = [this, document.getElementById(`${ID - 1}`), document.getElementById(`${ID + 1}`), document.getElementById(`${ID - 10}`), document.getElementById(`${ID + 10}`)];
+                        while (change.indexOf(null) != -1) {
+                            change.splice(change.indexOf(null), 1);
+                        }
+                        console.log(change);
+                        change.forEach(element => {
+                            if (element.style.backgroundColor === "red") {
+                                element.style.backgroundColor = "blue";
+                            } else {
+                                element.style.backgroundColor = "red";
+                            }
+                        });
+                    });
+                    game.appendChild(this.s);
+                }
+            }
+            for (let i = 1; i < 4; i++) {
+                for (let j = 1; j < 4; j++) {
+                    let me = new Square(j, i);
+                    console.log(me);
+                }
+            }
+        });
+    </script>
+</head>
+
+<body>
+
+    <div id="lights">
+
+    </div>
+
+</body>
+
+</html>
