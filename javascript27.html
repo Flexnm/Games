@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-size: 18pt;
+        }
+
+        td {
+            padding: 5px 10px 5px 10px;
+            border: black solid 1px;
+            width: fit-content;
+            height: fit-content;
+        }
+    </style>
+    <script src=Jquerysrc.js></script>
+    <script>
+        // function nums(sqrNumber) {
+        //     let arrs = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        //     let sqrArr = [];
+        //     let sqrMembers = $(`.s${sqrNumber}`);
+        //     for (let i in sqrMembers) {
+        //         if (sqrMembers.hasOwnProperty(i)) {
+        //             if (i < sqrMembers.length) { // 0 < i < 8
+        //                 for (let j in sqrMembers) {
+        //                     if (sqrMembers.hasOwnProperty(j)) {
+        //                         if(j < sqrMembers.length && j.innerHTML != i.innerHTML){
+        //                             arrs.splice(arrs.indexOf(Number(sqrMembers[j].innerHTML)), 1);
+        //                         }
+        //                     }
+        //                 }
+        //                 let rand = parseInt(Math.random()*arrs.length); // gives a unique number within the square.
+        //                 sqrMembers[i].innerHTML = arrs[rand];
+        //                 sqrArr.push(sqrMembers[i].innerHTML);
+        //             }
+        //         }
+        //     }
+        //     return sqrArr;
+        // };
+
+        function nums(sqrNumber) {
+            // let arrs = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+            let sqrArr = [];
+            let stuff = document.getElementsByClassName(`s${sqrNumber}`);
+            let sqrMembers = [];
+            for (let f = 0; f < stuff.length; f++) {
+                sqrMembers.push(stuff.item(f));
+            }
+            for (let i = 0; i < sqrMembers.length; i++) {
+                let curMember = sqrMembers[i];
+                let arrs = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+
+                for (let j = 0; j < sqrMembers.length; j++) {
+                    if (j != i) {
+                        let rmvNum = parseInt(sqrMembers[j].innerHTML)
+                        let indx = arrs.indexOf(rmvNum);
+                        if (indx != -1) {
+                            arrs.splice(indx, 1);
+                        }
+                    }
+                }
+                for (let row = 1; row <= 9; row++) {
+                    let colMember = document.getElementById(`r${row}c${curMember.id.charAt(3)}`);
+                    if (curMember.id != colMember.id) {
+                        let rmvNum = parseInt(colMember.innerHTML);
+                        let indx = arrs.indexOf(rmvNum);
+                        if (indx != -1) {
+                            arrs.splice(indx, 1);
+                        }
+                    }
+                }
+
+                for (let col = 1; col <= 9; col++) {
+                    let rowMember = document.getElementById(`r${curMember.id.charAt(1)}c${col}`);
+                    if (curMember.id != rowMember.id) {
+                        let rmvNum = parseInt(rowMember.innerHTML);
+                        let indx = arrs.indexOf(rmvNum);
+                        if (indx != -1) {
+                            arrs.splice(indx, 1);
+                        }
+                    }
+                }
+                let rand = parseInt(Math.random() * arrs.length); // gives a unique number within the square.
+                curMember.innerHTML = arrs[rand];
+                sqrArr.push(curMember.innerHTML);
+            }
+            return sqrArr;
+        }
+
+        // the function gets a square family index.
+        // the function then picks a member of the square family.
+        // the function looks through the other square members.
+        // the function removes from the numbers array the value of other square members.
+        // the function looks through the other row members.
+        // the function removes from the numbers array the value of other row members.
+        // the function looks through the other column members.
+        // the functio nremoves from the numbers array the values of other column members.
+
+
+
+        // the function gets a square family index.
+        // the function then picks a member of the square family.
+        // the function checks the number of memebers the square has.
+        // the function removes from the numbers array the value of those square members.
+        // the function checks for the number of members the row has.
+        // the function removes from the numbers array the value of those row members.
+        // the function checks for the number of members the column has.
+        // the functio nremoves from the numbers array the values of those column members.
+
+
+
+
+
+
+        // arrs = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        $(function () {
+            let n = 0;
+            for (let row = 1; row <= 9; row++) {
+                let sqr = 1 + n;
+                for (let col = 1; col <= 9; col++) {
+                    $(`#r${row}`).append(`<td id="r${row}c${col}" class="s${sqr}" style="background-color:rgb(100,100,${sqr * 26})">r${row}c${col}s${sqr}</td>`); //
+                    if (col % 3 == 0) {
+                        sqr++;
+                    }
+                }
+                if (row % 3 == 0) {
+                    n += 3;
+                }
+            }
+            for (let i = 1; i <= 9; i++) {
+                console.log(nums(i));
+            }
+        });
+        // let arrthing = [];
+        // let thing = $(`.s${sqr}`);
+        // arrthing = []; //
+        // for (const meh in thing) {
+        //     if (thing.hasOwnProperty(meh)) {
+        //         arrthing.push(thing[meh])
+        //     }
+        // }
+        // console.log(arrthing);
+
+
+         //     let num = arrs[parseInt(Math.random() * arrs[row - 1].length)];
+            //     let numOut = arrs[row - 1].indexOf(num);
+            //     arrs[row - 1].splice(numOut, 1);
+    </script>
+</head>
+
+<body>
+    <button onclick="aaa()">button</button>
+    <table>
+        <tr id="r1"></tr>
+        <tr id="r2"></tr>
+        <tr id="r3"></tr>
+        <tr id="r4"></tr>
+        <tr id="r5"></tr>
+        <tr id="r6"></tr>
+        <tr id="r7"></tr>
+        <tr id="r8"></tr>
+        <tr id="r9"></tr>
+    </table>
+</body>
+
+</html>
