@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        #board {
+            /* display:grid; */
+            /* grid-template-columns: auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto ; */
+            background-color: lightblue;
+            /* width: 800px;
+            height: 800px; */
+        }
+
+        #ball {
+            background-color: red;
+            /* width: 20px;
+            height: 20px; */
+            position: relative;
+
+        }
+
+        .bat {
+            background-color: blue;
+            position: relative;
+        }
+
+        .line {
+            position: relative;
+        }
+    </style>
+   
+
+
+
+
+    <script>
+
+        /*
+            movement is the current position on the X and Y axis with subtraction or addition of a value that:
+            if it hits a wall on top, from addition to Y moves to subtraction from Y.
+            if it hits a wall on bottom, from subtraction from Y to addition to Y.
+            if it hits bat to the left, from subtraction from X to addition to X.
+            if it hits bat to the right, from addition to X to subtraction from X.
+            the size of that value changes depends on where on the bat the ball hits:
+            closer to the margins size is bigger, closer to the center size is smaller.
+        
+        */
+
+
+
+        window.addEventListener("load", function () {
+            
+
+            var game = document.getElementById("game");
+            var board = document.createElement("div");
+            var player = document.createElement("div");
+            var theBall = document.createElement("div");
+            // var derp = document.createElement("span");
+            // derp.className = "line";
+            // derp.backgroundColor = "blue";
+            // derp.style.height = "1px";
+            // derp.innerHTML = "derp";
+            // derp.style.top = "172px";
+            // derp.style.left = "778px";
+
+            
+            
+            board.id = "board";
+            board.style.width = "800px";
+            board.style.height = "400px";
+            boardH = parseInt(board.style.height);
+            boardW = parseInt(board.style.width);
+            // game.appendChild(derp);
+            game.appendChild(board);
+            theBall.id = "ball";
+            theBall.style.left = "400px";
+            theBall.style.top = "200px";
+
+            theBall.style.width = "20px";
+            theBall.style.height = "20px";
+            player.id = "player";
+            player.className = "bat";
+            player.style.width = "20px";
+            player.style.height = "100px";
+            player.style.top = boardH / 4 + "px";
+            player.style.left = (boardW - 40) + "px";
+            board.appendChild(theBall);
+            board.appendChild(player);
+            var line = document.createElement("div");
+            var line2 = document.createElement("div");
+            line.className = "line";
+            line.style.backgroundColor = "black";
+            line.style.height = "1px";
+            line.style.top = (parseInt(player.style.top) - parseInt(player.style.height)) + "px";
+            line2.className = "line";
+            line2.style.backgroundColor = "red";
+            line2.style.height = "1px";
+            line2.style.top = (parseInt(player.style.top) - 1) + "px";
+            board.appendChild(line);
+            board.appendChild(line2);
+            var logger = document.createElement("div");
+            game.appendChild(logger);
+
+
+            playAreaH = boardH - parseInt(theBall.style.height);
+            playAreaW = boardW - parseInt(theBall.style.width);
+
+            var ballX = theBall.style.left;
+            var ballY = theBall.style.top;
+
+            var playerMove = 10;
+            var changeX = -5;
+            var changeY = parseInt(Math.random() * 4 + 1);
+            const STARTINGX = parseInt(theBall.style.left);
+            const STARTINGY = parseInt(theBall.style.top);
+            const SPEED = 100;
+            const STARTSPEED = 10;
+            var currSpeed = 10;
+            var speedCNG = 1;
+            var playerHead = parseInt(player.style.top) + parseInt(player.style.height) + 20;
+            var playerButt = parseInt(player.style.top) - 16;
+
+            setInterval(function () {
+                // logger.innerHTML = "ball Y: " + parseInt(ballY) + ", player top side: " + playerButt + ", player bottm side: " + playerHead;
+                if (parseInt(ballY) > playerButt && parseInt(ballY) <= playerHead) {
+                    theBall.style.backgroundColor = "green";
+                } else {
+                    theBall.style.backgroundColor = "red";
+                }
+                if (changeX > 0 && parseInt(ballX) >= parseInt(player.style.left) - 15 && (parseInt(ballY) >= playerButt && parseInt(ballY) <= playerHead)) {
+                    console.log(changeX, changeY);
+                    let XY = offSet(playerHead, ballY, playerButt, changeX, changeY);
+                    changeX = XY[0];
+                    changeY = XY[1];
+                    console.log(changeX, changeY);
+                    changeX = -changeX;
+
+                }
+                if (parseInt(ballX) >= parseInt(playAreaW)) {
+                    if (changeY > 0) {
+                        changeY = parseInt(Math.random() * 4 + 1);
+                    } else {
+                        changeY = parseInt(Math.random() * 4 + 1) * (-1);
+                    }
+                    changeX = -5;
+                    currSpeed = STARTSPEED;
+                    ballX = STARTINGX + "px";
+                    ballY = STARTINGY + "px";
+                }
+                ballX = parseInt(ballX) + changeX + "px";
+                ballY = parseInt(ballY) + changeY + "px";
+                if (parseInt(ballX) <= 0) {
+                    changeX = -changeX;
+                }
+                if (parseInt(ballY) >= playAreaH || parseInt(ballY) <= 0) {
+                    changeY = -changeY;
+                    if (currSpeed != SPEED) { // currently does nothing. supposed to set the timer interval value.
+                        currSpeed += speedCNG;
+                    } else {
+                        currSpeed += speedCNG;
+                        speedCNG = -speedCNG;
+                    }
+                }
+                theBall.style.left = ballX;
+                theBall.style.top = ballY;
+            }, currSpeed);
+
+            // playerMove = 10;
+            
+            var woot = 0;
+            board.addEventListener("mousedown", function (mouse) {
+                
+                    logger.innerHTML = mouse.clientY + ", " + mouse.clientX + ", " + (20 + (playerHead+playerButt)/2);
+               
+            });
+            
+            document.addEventListener("keydown", function (key) {
+                switch (key.code) {
+                    case "ArrowUp":
+                        if (parseInt(player.style.top) > -20) {
+                            player.style.top = (parseInt(player.style.top) - playerMove) + "px";
+                        }
+                        break;
+                    case "ArrowDown":
+                        if (parseInt(player.style.top) < parseInt(board.style.height) + 10 - parseInt(player.style.top) / 2) {
+                            player.style.top = (parseInt(player.style.top) + playerMove) + "px";
+                        }
+                        break;
+                }
+                playerHead = parseInt(player.style.top) + parseInt(player.style.height) + 20;
+                playerButt = parseInt(player.style.top) - 16;
+            });
+
+            // (playerHead - (playerHead - playerButt) / 2) middle of the bat
+            function offSet(head, ballY, butt, xChange, yChange) {
+                let ballPos = parseInt(ballY);
+                // let newXY = []
+                let center = 20 + (head + butt)/2; // THIS ADDITION CALLS FOR REEVALUATING CALCULATIONS
+                let val = 1;
+                if(yChange < 0){
+                    val = -1;
+                }
+                if (ballPos > center) {
+                    // hit the bottom
+                    yChange = yChange + val;
+                } else {
+                    // hit the top
+                    yChange = yChange + val;
+                }
+
+                return newXY = [xChange, yChange];
+            }
+        });
+
+    </script>
+</head>
+
+<body id="game">
+
+<canvas id="canvas" height="150px" width="150px" style="background-color: red;"></canvas>
+</body>
+
+</html>
