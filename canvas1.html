@@ -7,6 +7,11 @@
     <title>Document</title>
 
     <style>
+        body {
+            text-align: center;
+
+        }
+
         #canvas {
             border: 1px solid black;
         }
@@ -17,9 +22,15 @@
             var canvas = document.getElementById('canvas');
             var ctx = canvas.getContext('2d');
             var raf; // requestAnimationFrame
+            var p1GoUp = false;
+            var p1GoDown = false;
+            var p2GoUp = false;
+            var p2GoDown = false;
+            var bounce = true;
+
             var ball = {
-                x: parseInt(Math.random() * 51 + 100),
-                y: parseInt(Math.random() * 201 + 100),
+                x: parseInt(canvas.width / 2),
+                y: parseInt(Math.random() * ((canvas.height / 2) + 1) + 100),
                 vx: parseInt(Math.random() * 3 + 3),
                 vy: parseInt(Math.random() * 3 + 3),
                 radius: 15,
@@ -32,6 +43,7 @@
                     ctx.fill();
                 }
             }
+
             var player = {
                 x: 760,
                 y: 200,
@@ -45,7 +57,6 @@
                     ctx.fillRect(this.x, this.y, this.w, this.h);
                     this.yh = this.y + this.h;
                 }
-
             }
 
             var player2 = {
@@ -61,30 +72,23 @@
                     ctx.fillRect(this.x, this.y, this.w, this.h);
                     this.yh = this.y + this.h;
                 }
-
             }
 
             var scoreBoard = {
                 p1s: player.score,
                 p2s: player2.score,
+                p1hs: true,
+                p2hs: true,
                 draw: function () {
                     ctx.fillStyle = `rgba(0, 0, 0, 0.2)`;
                     ctx.font = "48pt Times New Roman";
                     ctx.textAlign = "center";
                     ctx.fillText(`${this.p2s} ---|--- ${this.p1s}`, canvas.width / 2, 80)
-
                 }
             }
 
-            var p1GoUp = false;
-            var p1GoDown = false;
-            var p2GoUp = false;
-            var p2GoDown = false;
-            var bounce = true;
-
             document.addEventListener("keydown", keyDownHandler, false); // this is all about if a key is pressed, doesnt matter what key that is.
             document.addEventListener("keyup", keyUpHandler, false);
-
             function keyDownHandler(e) {
                 if (e.key == "Up" || e.key == "ArrowUp") {
                     p1GoUp = true;
@@ -116,6 +120,31 @@
             function game() {
                 ctx.fillStyle = `rgba(255, 255, 255, 0.4)`;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
+                if (scoreBoard.p1s + scoreBoard.p2s == 6 && canvas.width < 1400) {
+                    let wider = setInterval(function () {
+                        player.x += 30;
+                        canvas.width += 30;
+                        canvas.height += 10;
+                        if (canvas.width >= 1400) {
+                            clearInterval(wider);
+                        }
+                    }, 20);
+                    // player.x += 600;
+                    // canvas.width += 600;
+                    // canvas.height += 200;
+                }
+                if (scoreBoard.p1s % 8 == 0 && scoreBoard.p1s > 0 && scoreBoard.p1hs) {
+                    player.h += 20
+                    scoreBoard.p1hs = false;
+                } else if (scoreBoard.p1s % 8 != 0) {
+                    scoreBoard.p1hs = true;
+                }
+                if (scoreBoard.p2s % 8 == 0 && scoreBoard.p2s > 0 && scoreBoard.p2hs) {
+                    player2.h += 20
+                    scoreBoard.p2hs = false;
+                } else if (scoreBoard.p2s % 8 != 0) {
+                    scoreBoard.p2hs = true;
+                }
                 ball.draw();
                 player.draw();
                 player2.draw();
@@ -125,127 +154,142 @@
                     if (ball.x + ball.vx <= player2.x + player2.w + ball.radius && ball.x + ball.vx > ball.radius / 2 && !bounce) {
                         if (ball.y >= player2.y && ball.y <= player2.yh) {
                             let offset = Math.abs(ball.y - (player2.yh + player2.y) / 2);
-                            //document.getElementById("log2").innerHTML = offset / 14;
+                            // document.getElementById("log2").innerHTML = offset / 14;
                             if (Math.abs(parseInt(ball.vy * (offset / 14))) > 10) {
-                                ball.vy = 10;
+                                if (ball.vy > 0) {
+                                    ball.vy = 10;
+                                } else {
+                                    ball.vy = -10;
+                                }
                             } else if (Math.abs(parseInt(ball.vy * (offset / 14))) < 3) {
-                                ball.vy = 3;
+                                if (ball.vy > 0) {
+                                    ball.vy = 3;
+                                } else {
+                                    ball.vy = -3;
+                                }
                             } else {
                                 ball.vy = parseInt(ball.vy * (offset / 14));
                             }
-                            if (Math.abs(parseInt(ball.vx * (offset / 20))) > 8) {
-                                ball.vx = -8;
-                            } else if (Math.abs(parseInt(ball.vx * (offset / 20))) < 3) {
-                                ball.vx = -3;
+                            if (Math.abs(parseInt(ball.vx * (offset / 20))) > canvas.width / 100) {
+                                ball.vx = -(canvas.width / 100);
+                            } else if (Math.abs(parseInt(ball.vx * (offset / 20))) < canvas.width / 200) {
+                                ball.vx = -(canvas.width / 200);
                             } else {
                                 ball.vx = parseInt(ball.vx * (offset / 20));
                             }
-
-                            ball.vx = -ball.vx;
+                            ball.vx = parseInt(-ball.vx + (-ball.vx / 3));
                             bounce = true;
                         }
-
                     }
                     if (ball.x + ball.vx >= player.x - ball.radius && bounce) {
                         if (ball.y >= player.y && ball.y <= player.yh) {
                             let offset = Math.abs(ball.y - (player.yh + player.y) / 2);
-                            //document.getElementById("log2").innerHTML = offset / 14;
+                            // document.getElementById("log2").innerHTML = offset / 14;
                             if (Math.abs(parseInt(ball.vy * (offset / 14))) > 10) {
-                                ball.vy = 10;
+                                if (ball.vy > 0) {
+                                    ball.vy = 10;
+                                } else {
+                                    ball.vy = -10;
+                                }
                             } else if (Math.abs(parseInt(ball.vy * (offset / 14))) < 3) {
-                                ball.vy = 3;
+                                if (ball.vy > 0) {
+                                    ball.vy = 3;
+                                } else {
+                                    ball.vy = -3;
+                                }
                             } else {
                                 ball.vy = parseInt(ball.vy * (offset / 14));
                             }
-                            if (Math.abs(parseInt(ball.vx * (offset / 20))) > 8) {
-                                ball.vx = 8;
-                            } else if (Math.abs(parseInt(ball.vx * (offset / 20))) < 3) {
-                                ball.vx = 3;
+                            if (Math.abs(parseInt(ball.vx * (offset / 20))) > canvas.width / 100) {
+                                ball.vx = canvas.width / 100;
+                            } else if (Math.abs(parseInt(ball.vx * (offset / 20))) < canvas.width / 200) {
+                                ball.vx = canvas.width / 200;
                             } else {
                                 ball.vx = parseInt(ball.vx * (offset / 20));
                             }
-                            ball.vx = -ball.vx;
+                            ball.vx = parseInt(-ball.vx + (-ball.vx / 3));
                             bounce = false;
-
                         }
                     }
                 } else {
                     if (ball.vx > 0) {
-                        ball.x = parseInt(Math.random() * 51 + 200);
-                        ball.y = parseInt(Math.random() * 201 + 100);
-                        ball.vx = parseInt(Math.random() * 3 + 3);
+                        ball.x = parseInt(canvas.width / 2);
+                        ball.y = parseInt(Math.random() * ((canvas.height / 2) + 1) + 100);
+                        ball.vx = parseInt(Math.random() * canvas.width / 200 + canvas.width / 200);
                         ball.vy = parseInt(Math.random() * 3 + 3);
                         bounce = true;
                         player2.score++;
                         scoreBoard.p2s++;
                     } else {
-                        ball.x = parseInt(Math.random() * 51 + 600);
-                        ball.y = parseInt(Math.random() * 201 + 100);
-                        ball.vx = parseInt(Math.random() * 3 + 3) * (-1);
+                        ball.x = parseInt(canvas.width / 2);
+                        ball.y = parseInt(Math.random() * ((canvas.height / 2) + 1) + 100);
+                        ball.vx = parseInt(Math.random() * canvas.width / 200 + canvas.width / 200) * (-1);
                         ball.vy = parseInt(Math.random() * 3 + 3);
                         bounce = false;
                         player.score++;
                         scoreBoard.p1s++;
                     }
                 }
-
-
-
-
-
-
-
                 if (ball.y + ball.vy >= canvas.height - ball.radius || ball.y + ball.vy <= ball.radius) {
                     ball.vy = -ball.vy;
                 }
-
                 if (p1GoDown) {
                     player.y += parseInt(player.h / (player.h / 10));
                     if (player.yh > canvas.height) {
                         player.y = canvas.height - player.h;
                     }
-
                 } else if (p1GoUp) {
                     player.y -= parseInt(player.h / (player.h / 10));
                     if (player.y <= 0) {
                         player.y = 0;
                     }
                 }
-
                 if (p2GoDown) {
                     player2.y += parseInt(player2.h / (player2.h / 10));
                     if (player2.yh > canvas.height) {
                         player2.y = canvas.height - player2.h;
                     }
-
                 } else if (p2GoUp) {
                     player2.y -= parseInt(player2.h / (player2.h / 10));
                     if (player2.y <= 0) {
                         player2.y = 0;
                     }
                 }
-
                 ball.x += ball.vx;
                 ball.y += ball.vy;
+                if (player2.yh - player2.h/2 < ball.y) {
+                    player2.y += 4 + Math.abs(parseInt(ball.vy/5));
+                    if (player2.yh > canvas.height) {
+                        player2.y = canvas.height - player2.h;
+                    }
+                }
+                if (player2.yh - player2.h/2 > ball.y) {
+                    player2.y -= 4 + Math.abs(parseInt(ball.vy/5));
+                    if (player2.y <= 0) {
+                        player2.y = 0;
+                    }
+                }
+                // if (player2.y <= 0) {
+                //     player2.y = 0;
+                // }
+                // if (player2.yh > canvas.height) {
+                //     player2.y = canvas.height - player2.h;
+                // }
                 raf = window.requestAnimationFrame(game);
             }
 
             canvas.addEventListener("mouseover", function (e) {
                 raf = window.requestAnimationFrame(game);
-
             });
 
             canvas.addEventListener("mouseout", function (e) {
                 window.cancelAnimationFrame(raf);
             });
 
-
-
             player.draw();
             player2.draw();
             ball.draw();
             scoreBoard.draw();
-
         })
 
     </script>
