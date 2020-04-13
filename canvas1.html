@@ -120,7 +120,7 @@
                 player.draw();
                 player2.draw();
                 scoreBoard.draw();
-                document.getElementById("log").innerHTML = `${player.y} , ${player.yh}, ${(player.yh + player.y) / 2}, ball: ${ball.vx}, ${ball.vy}`;
+                // document.getElementById("log").innerHTML = `${player.y} , ${player.yh}, ${(player.yh + player.y) / 2}, ball: ${ball.vx}, ${ball.vy}`;
                 if (ball.x + ball.vx <= canvas.width - ball.radius / 2 && ball.x + ball.vx >= ball.radius / 2) {
                     if (ball.x + ball.vx <= player2.x + player2.w + ball.radius && ball.x + ball.vx > ball.radius / 2 && !bounce) {
                         if (ball.y >= player2.y && ball.y <= player2.yh) {
