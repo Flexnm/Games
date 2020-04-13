@@ -19,6 +19,7 @@
 
     <script>
         window.addEventListener("load", function () {
+            // basic variables that are used in the prgoram.
             var canvas = document.getElementById('canvas');
             var ctx = canvas.getContext('2d');
             var raf; // requestAnimationFrame
@@ -26,9 +27,9 @@
             var p1GoDown = false;
             var p2GoUp = false;
             var p2GoDown = false;
-            var bounce = true;
+            var bounce = true; // this makes it so that each player can hit the ball once and only once!
 
-            var ball = {
+            var ball = { // the ball and its stats.
                 x: parseInt(canvas.width / 2),
                 y: parseInt(Math.random() * ((canvas.height / 2) + 1) + 100),
                 vx: parseInt(Math.random() * 3 + 3),
@@ -44,7 +45,7 @@
                 }
             }
 
-            var player = {
+            var player = { // player to the right.
                 x: 760,
                 y: 200,
                 w: 20,
@@ -59,12 +60,13 @@
                 }
             }
 
-            var player2 = {
+            var player2 = { // player to the left
                 x: 20,
                 y: 200,
                 w: 20,
                 h: 120,
                 yh: 0,
+                spd: 4,
                 color: "green",
                 score: 0,
                 draw: function () {
@@ -74,7 +76,7 @@
                 }
             }
 
-            var scoreBoard = {
+            var scoreBoard = { // the scoreboard in the middle.
                 p1s: player.score,
                 p2s: player2.score,
                 p1hs: true,
@@ -89,6 +91,7 @@
 
             document.addEventListener("keydown", keyDownHandler, false); // this is all about if a key is pressed, doesnt matter what key that is.
             document.addEventListener("keyup", keyUpHandler, false);
+            // players controls when button held down
             function keyDownHandler(e) {
                 if (e.key == "Up" || e.key == "ArrowUp") {
                     p1GoUp = true;
@@ -102,7 +105,7 @@
                     p2GoDown = true;
                 }
             }
-
+            // players controls when button is no longer pressed
             function keyUpHandler(e) {
                 if (e.key == "Up" || e.key == "ArrowUp") {
                     p1GoUp = false;
@@ -116,11 +119,11 @@
                     p2GoDown = false;
                 }
             }
-
+            // the game logic.
             function game() {
                 ctx.fillStyle = `rgba(255, 255, 255, 0.4)`;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                if (scoreBoard.p1s + scoreBoard.p2s == 6 && canvas.width < 1400) {
+                ctx.fillRect(0, 0, canvas.width, canvas.height); // this and above this refresh the game state to create the illusion of movement.
+                if (scoreBoard.p1s + scoreBoard.p2s == 6 && canvas.width < 1400) { // this just makes the play area larger after some goals are scored (currently 6)
                     let wider = setInterval(function () {
                         player.x += 30;
                         canvas.width += 30;
@@ -133,43 +136,47 @@
                     // canvas.width += 600;
                     // canvas.height += 200;
                 }
+                // this makes the player size larger every 8 points scored.
                 if (scoreBoard.p1s % 8 == 0 && scoreBoard.p1s > 0 && scoreBoard.p1hs) {
                     player.h += 20
                     scoreBoard.p1hs = false;
                 } else if (scoreBoard.p1s % 8 != 0) {
                     scoreBoard.p1hs = true;
                 }
+                // does the same as above but for player 2.
                 if (scoreBoard.p2s % 8 == 0 && scoreBoard.p2s > 0 && scoreBoard.p2hs) {
                     player2.h += 20
                     scoreBoard.p2hs = false;
                 } else if (scoreBoard.p2s % 8 != 0) {
                     scoreBoard.p2hs = true;
                 }
+                // this is putting the entities on the board after refreshing.
                 ball.draw();
                 player.draw();
                 player2.draw();
                 scoreBoard.draw();
-                // document.getElementById("log").innerHTML = `${player.y} , ${player.yh}, ${(player.yh + player.y) / 2}, ball: ${ball.vx}, ${ball.vy}`;
-                if (ball.x + ball.vx <= canvas.width - ball.radius / 2 && ball.x + ball.vx >= ball.radius / 2) {
-                    if (ball.x + ball.vx <= player2.x + player2.w + ball.radius && ball.x + ball.vx > ball.radius / 2 && !bounce) {
-                        if (ball.y >= player2.y && ball.y <= player2.yh) {
-                            let offset = Math.abs(ball.y - (player2.yh + player2.y) / 2);
-                            // document.getElementById("log2").innerHTML = offset / 14;
-                            if (Math.abs(parseInt(ball.vy * (offset / 14))) > 10) {
+                // document.getElementById("log").innerHTML = `${player.y} , ${player.yh}, ${(player.yh + player.y) / 2}, ball: ${ball.vx}, ${ball.vy}`; // debug thing
+                if (ball.x + ball.vx <= canvas.width - ball.radius / 2 && ball.x + ball.vx >= ball.radius / 2) { // if the ball is in the play area (10 pixels off the edge) (left and right sides.)
+                    if (ball.x + ball.vx <= player2.x + player2.w + ball.radius && ball.x + ball.vx > ball.radius / 2 && !bounce) { // this checks if the ball is in an area close to player 2 and if it is moving towards player 2 (!bounce meaning the ball is moving to the left side of the screen.)
+                        if (ball.y >= player2.y && ball.y <= player2.yh) { // checks if the ball is in a range that is covered by player 2 (aka, ball is hitting the bat)
+                            let offset = Math.abs(ball.y - (player2.yh + player2.y) / 2); // change the ball speed (up and down) depends on where the ball hit the player (edge means ball will go much faster than if it hits the middle) to create variance.
+                            // document.getElementById("log2").innerHTML = offset / 14; // debug thing
+                            if (Math.abs(parseInt(ball.vy * (offset / 14))) > 10) { // this limits the top speed of the ball.
                                 if (ball.vy > 0) {
                                     ball.vy = 10;
                                 } else {
                                     ball.vy = -10;
                                 }
-                            } else if (Math.abs(parseInt(ball.vy * (offset / 14))) < 3) {
+                            } else if (Math.abs(parseInt(ball.vy * (offset / 14))) < 3) { // this limits the minimal speed of the ball.
                                 if (ball.vy > 0) {
                                     ball.vy = 3;
                                 } else {
                                     ball.vy = -3;
                                 }
                             } else {
-                                ball.vy = parseInt(ball.vy * (offset / 14));
+                                ball.vy = parseInt(ball.vy * (offset / 14)); // this just sets the new speed.
                             }
+                            // this is similar to the thing above, creates this variance to the speed of the ball (left and right)
                             if (Math.abs(parseInt(ball.vx * (offset / 20))) > canvas.width / 100) {
                                 ball.vx = -(canvas.width / 100);
                             } else if (Math.abs(parseInt(ball.vx * (offset / 20))) < canvas.width / 200) {
@@ -177,14 +184,15 @@
                             } else {
                                 ball.vx = parseInt(ball.vx * (offset / 20));
                             }
-                            ball.vx = parseInt(-ball.vx + (-ball.vx / 3));
-                            bounce = true;
+                            ball.vx = parseInt(-ball.vx + (-ball.vx / 3)); // this flips the direction the ball is going.
+                            bounce = true; // this is confirming that the ball can be hit by player 1.
                         }
                     }
+                    // this is all of the above but for player 1.
                     if (ball.x + ball.vx >= player.x - ball.radius && bounce) {
                         if (ball.y >= player.y && ball.y <= player.yh) {
                             let offset = Math.abs(ball.y - (player.yh + player.y) / 2);
-                            // document.getElementById("log2").innerHTML = offset / 14;
+                            // document.getElementById("log2").innerHTML = offset / 14; // debug thing
                             if (Math.abs(parseInt(ball.vy * (offset / 14))) > 10) {
                                 if (ball.vy > 0) {
                                     ball.vy = 10;
@@ -211,6 +219,7 @@
                             bounce = false;
                         }
                     }
+                    // this detects that the ball is leaving the play area (left and right) and then just gives score to the scoring player and spawns the ball in a random place: closer to the player that scored a goal but moving towards the other player (so the guy that got a goal scored against him will be the first to hit the ball in the next round.)
                 } else {
                     if (ball.vx > 0) {
                         ball.x = parseInt(canvas.width / 2);
@@ -230,10 +239,12 @@
                         scoreBoard.p1s++;
                     }
                 }
+                // this just keeps the ball in the play area (up and down)
                 if (ball.y + ball.vy >= canvas.height - ball.radius || ball.y + ball.vy <= ball.radius) {
                     ball.vy = -ball.vy;
                 }
-                if (p1GoDown) {
+                // this is just the input calculations (it moves the players a number of units towards the direction held on the keyboard)
+                if (p1GoDown) { // player 1
                     player.y += parseInt(player.h / (player.h / 10));
                     if (player.yh > canvas.height) {
                         player.y = canvas.height - player.h;
@@ -244,7 +255,7 @@
                         player.y = 0;
                     }
                 }
-                if (p2GoDown) {
+                if (p2GoDown) { // player 2
                     player2.y += parseInt(player2.h / (player2.h / 10));
                     if (player2.yh > canvas.height) {
                         player2.y = canvas.height - player2.h;
@@ -255,24 +266,31 @@
                         player2.y = 0;
                     }
                 }
+                // this is the calculation of the ball speed (adds the speed value to its position so when it is refreshed the ball is in the "moved" position)
                 ball.x += ball.vx;
                 ball.y += ball.vy;
-                // advanced AI opponent
-                if (player2.yh - player2.h/2 < ball.y) {
-                    player2.y += 4 + Math.abs(parseInt(ball.vy/5));
+                // AI stats
+                if (ball.vx < 0) { // gives the ai speed depending if the ball is moving towards it or away from it.
+                    player2.spd = 4;
+                } else {
+                    player2.spd = 2;
+                }
+                if (player2.yh - player2.h / 2 < ball.y) { // lines the center of the ai bat with the y value of the ball as the ball is below the bat
+                    player2.y += player2.spd + Math.abs(parseInt(ball.vy / 4));
                     if (player2.yh > canvas.height) {
                         player2.y = canvas.height - player2.h;
                     }
                 }
-                if (player2.yh - player2.h/2 > ball.y) {
-                    player2.y -= 4 + Math.abs(parseInt(ball.vy/5));
+                if (player2.yh - player2.h / 2 > ball.y) { // lines the center of the ai bat with the y value of the ball as the ball is above the bat
+                    player2.y -= player2.spd + Math.abs(parseInt(ball.vy / 4));
                     if (player2.y <= 0) {
                         player2.y = 0;
                     }
                 }
-                raf = window.requestAnimationFrame(game);
-            }
 
+                raf = window.requestAnimationFrame(game); // this refreshes the whole thing.
+            }
+            // these two makes it so that the game only runs if you have your mouse over the play area.
             canvas.addEventListener("mouseover", function (e) {
                 raf = window.requestAnimationFrame(game);
             });
@@ -280,7 +298,7 @@
             canvas.addEventListener("mouseout", function (e) {
                 window.cancelAnimationFrame(raf);
             });
-
+            // the initial drawing of the game (the starting position)
             player.draw();
             player2.draw();
             ball.draw();
