@@ -125,7 +125,7 @@
                     if (ball.x + ball.vx <= player2.x + player2.w + ball.radius && ball.x + ball.vx > ball.radius / 2 && !bounce) {
                         if (ball.y >= player2.y && ball.y <= player2.yh) {
                             let offset = Math.abs(ball.y - (player2.yh + player2.y) / 2);
-                            document.getElementById("log2").innerHTML = offset / 14;
+                            //document.getElementById("log2").innerHTML = offset / 14;
                             if (Math.abs(parseInt(ball.vy * (offset / 14))) > 10) {
                                 ball.vy = 10;
                             } else if (Math.abs(parseInt(ball.vy * (offset / 14))) < 3) {
@@ -149,7 +149,7 @@
                     if (ball.x + ball.vx >= player.x - ball.radius && bounce) {
                         if (ball.y >= player.y && ball.y <= player.yh) {
                             let offset = Math.abs(ball.y - (player.yh + player.y) / 2);
-                            document.getElementById("log2").innerHTML = offset / 14;
+                            //document.getElementById("log2").innerHTML = offset / 14;
                             if (Math.abs(parseInt(ball.vy * (offset / 14))) > 10) {
                                 ball.vy = 10;
                             } else if (Math.abs(parseInt(ball.vy * (offset / 14))) < 3) {
