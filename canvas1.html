@@ -257,6 +257,7 @@
                 }
                 ball.x += ball.vx;
                 ball.y += ball.vy;
+                // advanced AI opponent
                 if (player2.yh - player2.h/2 < ball.y) {
                     player2.y += 4 + Math.abs(parseInt(ball.vy/5));
                     if (player2.yh > canvas.height) {
@@ -269,12 +270,6 @@
                         player2.y = 0;
                     }
                 }
-                // if (player2.y <= 0) {
-                //     player2.y = 0;
-                // }
-                // if (player2.yh > canvas.height) {
-                //     player2.y = canvas.height - player2.h;
-                // }
                 raf = window.requestAnimationFrame(game);
             }
 
